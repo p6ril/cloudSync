@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 
+import sys
 import os
 import os.path
 import subprocess
@@ -13,12 +14,10 @@ FILE_LIST = (
     {'src': DOCUMENTS + "/KeePassXC.kdbx", 'dst': SPIDEROAK_HIVE + "/security"},
 )
 SPIDEROAK_LIST = (
-    {'dir': SPIDEROAK_HIVE + "/finance", 'options': ""},
-    {'dir': SPIDEROAK_HIVE + "/documents", 'options': ""},
-    {'dir': SPIDEROAK_HIVE + "/security", 'options': "--exclude=security/archives"},
+    {'dir': SPIDEROAK_HIVE + "/finance", 'options': ()},
+    {'dir': SPIDEROAK_HIVE + "/documents", 'options': ()},
+    {'dir': SPIDEROAK_HIVE + "/security", 'options': ("--exclude=security/archives", )},
 )
-
-logging.basicConfig(filename=DOCUMENTS + "/internxtrsync.log", level=logging.DEBUG)
 
 
 def filersync(src, dst):
@@ -72,11 +71,18 @@ def internxtrsync():
     for item in SPIDEROAK_LIST:
         shellcmd = "rsync -rpAXogEt --delete "
         if len(item['options']) > 0:
-            shellcmd += item['options']
-        shellcmd += " '" + item['dir'] + "'  '" + INTERNXT_DRIVE + "'"
+            shellcmd += " ".join(item['options'])
+        shellcmd += " '" + item['dir'] + "' '" + INTERNXT_DRIVE + "'"
+        logging.debug(shellcmd)
         folderrsync(shellcmd, os.path.basename(item['dir']))
 
 
-for elm in FILE_LIST:
-    syncfile(elm['src'], elm['dst'])
-internxtrsync()
+logging.basicConfig(level=logging.INFO)
+option = "--all"  # default option
+if len(sys.argv) > 1 and sys.argv[1] in ("--spideroak", "--internxt", "--all"):
+    option = sys.argv[1]
+if option in ("--spideroak", "--all"):
+    for elm in FILE_LIST:
+        syncfile(elm['src'], elm['dst'])
+if option in ("--internxt", "--all"):
+    internxtrsync()

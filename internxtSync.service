@@ -1,0 +1,10 @@
+[Unit]
+Description=SpiderOak Hive sync to Internxt Drive as a backup
+Wants=internxtSync.timer
+
+[Service]
+Type=oneshot
+ExecStart=/home/gandalf/bin/cloudsync.py --internxt
+
+[Install]
+WantedBy=multi-user.target
