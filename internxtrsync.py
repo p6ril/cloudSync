@@ -3,6 +3,7 @@
 import os
 import os.path
 import subprocess
+import logging
 
 USER_HOME = "/home/gandalf"
 DOCUMENTS = USER_HOME + "/Documents"
@@ -11,24 +12,34 @@ INTERNXT_DRIVE = USER_HOME + "/Internxt Drive"
 FILE_LIST = (
     {'src': DOCUMENTS + "/KeePassXC.kdbx", 'dst': SPIDEROAK_HIVE + "/security"},
 )
+SPIDEROAK_LIST = (
+    {'dir': SPIDEROAK_HIVE + "/finance", 'options': ""},
+    {'dir': SPIDEROAK_HIVE + "/documents", 'options': ""},
+    {'dir': SPIDEROAK_HIVE + "/security", 'options': "--exclude=security/archives"},
+)
+
+logging.basicConfig(filename=DOCUMENTS + "/internxtrsync.log", level=logging.DEBUG)
 
 
 def filersync(src, dst):
     sync = subprocess.run(["rsync -pAXogEt '" + src + "' '" + dst + "'"], shell=True)
     if sync.returncode != 0:
-        print("ERROR (filersync): something went wrong when syncing " + os.path.basename(src))
+        logging.error("ERROR (filersync): something went wrong when syncing " + os.path.basename(src))
         return False
     else:
-        print(src + " successfully synced to " + dst)
+        logging.info(src + " successfully synced to " + dst)
     return True
 
 
 def syncfile(src, dst):
+    """The syncfile(src, dst) function synces a file specified as src to the dst directory.
+    src (string) - source file full path (i.e. /path/filename)
+    dst (string) - the destination directory full path to rsync src to"""
     if not os.path.isfile(src):
-        print("ERROR (syncfile): " + src + " file not found!")
+        logging.error("ERROR (syncfile): " + src + " file not found!")
         return False
     if not os.path.isdir(dst):
-        print("ERROR (syncfile): the sync destination must be a directory.")
+        logging.error("ERROR (syncfile): the sync destination must be a directory.")
         return False
     srcpath, filename = os.path.split(src)
     if len(srcpath) == 0:
@@ -40,7 +51,7 @@ def syncfile(src, dst):
         srcmodtime = os.path.getmtime(src)
         dstmodtime = os.path.getmtime(target)
         if srcmodtime == dstmodtime:
-            print(filename + " is already in sync.")
+            logging.info(filename + " is already in sync.")
             return True
         elif dstmodtime > srcmodtime:
             return filersync(target, srcpath)
@@ -48,5 +59,24 @@ def syncfile(src, dst):
             return filersync(src, dst)
 
 
-for element in FILE_LIST:
-    syncfile(element['src'], element['dst'])
+def folderrsync(cmd, srcdir):
+    sync = subprocess.run([cmd], shell=True)
+    if sync.returncode == 0:
+        logging.info("SpiderOak's " + srcdir + " directory successfully synced to Internxt Drive.")
+    else:
+        logging.error("ERROR: something went wrong syncing SpiderOak's " + srcdir + " directory.")
+
+
+def internxtrsync():
+    """The internxtrsync() function keeps SpiderOak Hive and Internxt Drive in sync"""
+    for item in SPIDEROAK_LIST:
+        shellcmd = "rsync -rpAXogEt --delete "
+        if len(item['options']) > 0:
+            shellcmd += item['options']
+        shellcmd += " '" + item['dir'] + "'  '" + INTERNXT_DRIVE + "'"
+        folderrsync(shellcmd, os.path.basename(item['dir']))
+
+
+for elm in FILE_LIST:
+    syncfile(elm['src'], elm['dst'])
+internxtrsync()
