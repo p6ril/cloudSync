@@ -1,5 +1,5 @@
 [Unit]
-DescriptionSpiderOak Hive sync to Internxt Drive as a backup
+Description=SpiderOak Hive sync to Internxt Drive as a backup
 Requires=internxtSync.service
 
 [Timer]

@@ -13,10 +13,10 @@ INTERNXT_DRIVE = USER_HOME + "/Internxt Drive"
 FILE_LIST = (
     {'src': DOCUMENTS + "/KeePassXC.kdbx", 'dst': SPIDEROAK_HIVE + "/security"},
 )
-SPIDEROAK_LIST = (
-    {'dir': SPIDEROAK_HIVE + "/finance", 'options': ()},
-    {'dir': SPIDEROAK_HIVE + "/documents", 'options': ()},
-    {'dir': SPIDEROAK_HIVE + "/security", 'options': ("--exclude=security/archives", )},
+SPIDEROAK_DIR = (
+    {'path': SPIDEROAK_HIVE + "/finance", 'options': ()},
+    {'path': SPIDEROAK_HIVE + "/documents", 'options': ()},
+    {'path': SPIDEROAK_HIVE + "/security", 'options': ("--exclude=security/archives", )}
 )
 
 
@@ -32,25 +32,25 @@ def filersync(src, dst):
 
 def syncfile(src, dst):
     """The syncfile(src, dst) function synces a file specified as src to the dst directory.
-    src (string) - source file full path (i.e. /path/filename)
-    dst (string) - the destination directory full path to rsync src to"""
+    src (string) - the source file's full path (i.e. /path/filename)
+    dst (string) - the destination directory's full path to rsync src to"""
     if not os.path.isfile(src):
         logging.error("ERROR (syncfile): " + src + " file not found!")
         return False
     if not os.path.isdir(dst):
-        logging.error("ERROR (syncfile): the sync destination must be a directory.")
+        logging.error("ERROR (syncfile): the dst argument must be a directory.")
         return False
     srcpath, filename = os.path.split(src)
     if len(srcpath) == 0:
-        srcpath = os.getcwd()
+        srcpath = os.getcwd()  # precaution in case only a filename is passed see below line 56
     target = dst + "/" + filename
-    if not os.path.isfile(target):  # target doesn't exist, initiate sync
+    if not os.path.isfile(target):  # the src file doesn't exist in the dst directory, initiate sync
         return filersync(src, dst)
     else:
         srcmodtime = os.path.getmtime(src)
         dstmodtime = os.path.getmtime(target)
         if srcmodtime == dstmodtime:
-            logging.info(filename + " is already in sync.")
+            logging.info(filename + " file already in sync, nothing to be done.")
             return True
         elif dstmodtime > srcmodtime:
             return filersync(target, srcpath)
@@ -68,16 +68,22 @@ def folderrsync(cmd, srcdir):
 
 def internxtrsync():
     """The internxtrsync() function keeps SpiderOak Hive and Internxt Drive in sync"""
-    for item in SPIDEROAK_LIST:
-        shellcmd = "rsync -rpAXogEt --delete "
-        if len(item['options']) > 0:
-            shellcmd += " ".join(item['options'])
-        shellcmd += " '" + item['dir'] + "' '" + INTERNXT_DRIVE + "'"
-        logging.debug(shellcmd)
-        folderrsync(shellcmd, os.path.basename(item['dir']))
+    if not os.path.isdir(INTERNXT_DRIVE):
+        logging.error("ERROR (internxtsync): destination directory " + INTERNXT_DRIVE + " not found, aborting!")
+        return
+    for srcdir in SPIDEROAK_DIR:
+        if not os.path.isdir(srcdir['path']):
+            logging.error("ERROR (internxtsync): source directory " + srcdir['path'] + " not found, skipping ...")
+        else:
+            shellcmd = "rsync -rpAXogEt --delete "
+            if len(srcdir['options']) > 0:
+                shellcmd += " ".join(srcdir['options'])
+            shellcmd += " '" + srcdir['path'] + "' '" + INTERNXT_DRIVE + "'"
+            logging.debug(shellcmd)
+            folderrsync(shellcmd, os.path.basename(srcdir['path']))
 
 
-logging.basicConfig(level=logging.INFO)
+logging.basicConfig(level=logging.INFO)  # systemd works fine with standard outputs (stdout, stderr)
 option = "--all"  # default option
 if len(sys.argv) > 1 and sys.argv[1] in ("--spideroak", "--internxt", "--all"):
     option = sys.argv[1]
