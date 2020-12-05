@@ -1,9 +1,9 @@
 [Unit]
 Description=KeepassXC to SpiderOak Hive sync (both ways)
-Requires=spiderOakSync.service
+Requires=keepassxcSync.service
 
 [Timer]
-Unit=spiderOakSync.service
+Unit=keepassxcSync.service
 OnCalendar=*-*-* *:00,5,10,15,20,25,30,35,40,45,50,55:00
 
 [Install]

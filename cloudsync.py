@@ -13,25 +13,60 @@ INTERNXT_DRIVE = USER_HOME + "/Internxt Drive"
 FILE_LIST = (
     {'src': DOCUMENTS + "/KeePassXC.kdbx", 'dst': SPIDEROAK_HIVE + "/security"},
 )
-SPIDEROAK_DIR = (
-    {'path': SPIDEROAK_HIVE + "/finance", 'options': ()},
-    {'path': SPIDEROAK_HIVE + "/documents", 'options': ()},
-    {'path': SPIDEROAK_HIVE + "/security", 'options': ("--exclude=security/archives", )}
+FOLDER_LIST = (
+    {
+        'src': SPIDEROAK_HIVE + "/finance",
+        'dst': INTERNXT_DRIVE,
+        'options': ()
+    },
+    {
+        'src': SPIDEROAK_HIVE + "/documents",
+        'dst': INTERNXT_DRIVE,
+        'options': ()
+    },
+    {
+        'src': SPIDEROAK_HIVE + "/security",
+        'dst': INTERNXT_DRIVE,
+        'options': ("--exclude=security/archives", )
+    },
+    {
+        'src': USER_HOME + "/dev/cloudsync",
+        'dst': SPIDEROAK_HIVE + "/gitbackup",
+        'options': (
+            "--exclude=.git",
+            "--exclude=.idea",
+            "--exclude=venv"
+        )
+    },
+    {
+        'src': USER_HOME + "/dev/joplinRevisionsCleanUp",
+        'dst': SPIDEROAK_HIVE + "/gitbackup",
+        'options': (
+            "--exclude=.git",
+            "--exclude=.idea",
+            "--exclude=venv"
+        )
+    },
+    {
+        'src': SPIDEROAK_HIVE + "/gitbackup",
+        'dst': INTERNXT_DRIVE,
+        'options': ()
+    },
 )
 
 
 def filersync(src, dst):
     sync = subprocess.run(["rsync -pAXogEt '" + src + "' '" + dst + "'"], shell=True)
     if sync.returncode != 0:
-        logging.error("ERROR (filersync): something went wrong when syncing " + os.path.basename(src))
+        logging.error("ERROR (filersync): something went wrong when syncing " + os.path.basename(src) + "!")
         return False
     else:
-        logging.info(src + " successfully synced to " + dst)
+        logging.info(src + " successfully synced to " + dst + ".")
     return True
 
 
 def syncfile(src, dst):
-    """The syncfile(src, dst) function synces a file specified as src to the dst directory.
+    """The syncfile(src, dst) function synces a file specified as src with the dst directory (both ways).
     src (string) - the source file's full path (i.e. /path/filename)
     dst (string) - the destination directory's full path to rsync src to"""
     if not os.path.isfile(src):
@@ -58,29 +93,30 @@ def syncfile(src, dst):
             return filersync(src, dst)
 
 
-def folderrsync(cmd, srcdir):
+def folderrsync(cmd, src, dst):
     sync = subprocess.run([cmd], shell=True)
     if sync.returncode == 0:
-        logging.info("SpiderOak's " + srcdir + " directory successfully synced to Internxt Drive.")
+        logging.info(src + " directory successfully synced to " + dst + ".")
     else:
-        logging.error("ERROR: something went wrong syncing SpiderOak's " + srcdir + " directory.")
+        logging.error("ERROR: something went wrong syncing SpiderOak's " + src + " directory.")
 
 
-def internxtrsync():
-    """The internxtrsync() function keeps SpiderOak Hive and Internxt Drive in sync"""
-    if not os.path.isdir(INTERNXT_DRIVE):
-        logging.error("ERROR (internxtsync): destination directory " + INTERNXT_DRIVE + " not found, aborting!")
-        return
-    for srcdir in SPIDEROAK_DIR:
-        if not os.path.isdir(srcdir['path']):
-            logging.error("ERROR (internxtsync): source directory " + srcdir['path'] + " not found, skipping ...")
-        else:
-            shellcmd = "rsync -rpAXogEt --delete "
-            if len(srcdir['options']) > 0:
-                shellcmd += " ".join(srcdir['options'])
-            shellcmd += " '" + srcdir['path'] + "' '" + INTERNXT_DRIVE + "'"
-            logging.debug(shellcmd)
-            folderrsync(shellcmd, os.path.basename(srcdir['path']))
+def syncfolder(src, dst, options):
+    """The syncfolder() function keeps directories in sync (one way from src to dst)
+    src (string) - the source directory's full path
+    dst (string) - the destination directory's full path to rsync the src folder to
+    options (list) - additional parameters (like exclusions) to pass to rsync"""
+    if not os.path.isdir(dst):
+        logging.error("ERROR (syncfolder): destination directory " + dst + " not found, aborting task!")
+    elif not os.path.isdir(src):
+        logging.error("ERROR (syncfolder): source directory " + src + " not found, skipping task!")
+    else:
+        rsynccmd = "rsync -rpAXogEt --delete "
+        if len(options) > 0:
+            rsynccmd += " ".join(options)
+        rsynccmd += " '" + src + "' '" + dst + "'"
+        logging.debug(rsynccmd)
+        folderrsync(rsynccmd, src, dst)
 
 
 logging.basicConfig(level=logging.INFO)  # systemd works fine with standard outputs (stdout, stderr)
@@ -88,7 +124,8 @@ option = "--all"  # default option
 if len(sys.argv) > 1 and sys.argv[1] in ("--spideroak", "--internxt", "--all"):
     option = sys.argv[1]
 if option in ("--spideroak", "--all"):
-    for elm in FILE_LIST:
-        syncfile(elm['src'], elm['dst'])
+    for item in FILE_LIST:
+        syncfile(item['src'], item['dst'])
 if option in ("--internxt", "--all"):
-    internxtrsync()
+    for item in FOLDER_LIST:
+        syncfolder(item['src'], item['dst'], item['options'])

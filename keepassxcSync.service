@@ -1,6 +1,6 @@
 [Unit]
 Description=KeepassXC to SpiderOak Hive sync (both ways)
-Wants=spiderOakSync.timer
+Wants=keepassxcSync.timer
 
 [Service]
 Type=oneshot
