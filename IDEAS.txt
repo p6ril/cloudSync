@@ -1,0 +1,14 @@
+1. All rsync parameters could (should ?) be considered as options.
+   The syncfolder function sets a common set of options for all rsync jobs.
+   So far so good, but at some point it might be nice to allow for full
+   flexibility and move all rsync configurations to the FOLDER_LIST options.
+
+2. Allow for custom "hook" functions in FOLDER_LIST.
+   Example use case: when synchronising a git folder a specific hook function
+   could tar the .git directory and sync it as well as an archive.
+   Hooks (if any) would allow to trigger specific actions per folder.
+
+3. Building up on the hook idea, FOLDER_LIST data could be moved to a
+   separate file and be imported into the main program. Also it could
+   import modules from a subdirectory (if any). This way hook modules
+   could be added freely without any change to the main program.

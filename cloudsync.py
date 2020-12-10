@@ -35,7 +35,8 @@ FOLDER_LIST = (
         'options': (
             "--exclude=.git",
             "--exclude=.idea",
-            "--exclude=venv"
+            "--exclude=venv",
+            "--exclude=*.swp"
         )
     },
     {
@@ -44,7 +45,8 @@ FOLDER_LIST = (
         'options': (
             "--exclude=.git",
             "--exclude=.idea",
-            "--exclude=venv"
+            "--exclude=venv",
+            "--exclude=*.swp"
         )
     },
     {
@@ -111,7 +113,7 @@ def syncfolder(src, dst, options):
     elif not os.path.isdir(src):
         logging.error("ERROR (syncfolder): source directory " + src + " not found, skipping task!")
     else:
-        rsynccmd = "rsync -rpAXogEt --delete "
+        rsynccmd = "rsync -rpAXogEtu --delete "  # only updates as it's a one way sync
         if len(options) > 0:
             rsynccmd += " ".join(options)
         rsynccmd += " '" + src + "' '" + dst + "'"
