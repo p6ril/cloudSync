@@ -29,6 +29,14 @@ FOLDER_LIST = (
         )
     },
     {
+        'src': SPIDEROAK_HIVE + "/music",
+        'dst': INTERNXT_DRIVE,
+        'options': (
+            "-rpAXogEt",
+            "--delete"
+        )
+    },
+    {
         'src': SPIDEROAK_HIVE + "/security",
         'dst': INTERNXT_DRIVE,
         'options': (
