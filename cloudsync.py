@@ -25,7 +25,7 @@ def syncfile(src, dst):
     src (string) - the source file's full path (i.e. /path/filename)
     dst (string) - the destination directory's full path to rsync src to"""
     if not isinstance(src, str) or (isinstance(src, str) and len(src) == 0):
-        logging.error("ERROR (syncfile): improper mandatory src argument! Skipping file sync task.")
+        logging.error("ERROR (syncfile): improper mandatory src file argument! Skipping sync task.")
         return False
     if not isinstance(dst, str) or (isinstance(dst, str) and len(dst) == 0):
         logging.error("ERROR (syncfile): improper mandatory dst argument! Skipping file sync task.")
@@ -34,7 +34,7 @@ def syncfile(src, dst):
         logging.error("ERROR (syncfile): " + src + " file not found!")
         return False
     if not os.path.isdir(dst):
-        logging.error("ERROR (syncfile): the dst argument must be a directory.")
+        logging.error("ERROR (syncfile): the dst argument must be an existing directory.")
         return False
     srcpath, filename = os.path.split(src)
     if len(srcpath) == 0:
@@ -100,11 +100,11 @@ def syncfolder(config):
 
 logging.basicConfig(level=logging.INFO)  # systemd works fine with standard outputs (stdout, stderr)
 clarg = "--all"  # default command line argument
-if len(sys.argv) > 1 and sys.argv[1] in ("--spideroak", "--internxt", "--all"):
+if len(sys.argv) > 1 and sys.argv[1] in ("--file",  "--folder", "--all"):
     clarg = sys.argv[1]
-if clarg in ("--spideroak", "--all"):
+if clarg in ("--file", "--all"):
     for item in FILE_LIST:
         syncfile(item['src'], item['dst'])
-if clarg in ("--internxt", "--all"):
+if clarg in ("--folder", "--all"):
     for item in FOLDER_LIST:
         syncfolder(item)

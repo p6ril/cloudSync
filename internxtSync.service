@@ -4,7 +4,7 @@ Wants=internxtSync.timer
 
 [Service]
 Type=oneshot
-ExecStart=/home/gandalf/bin/cloudsync.py --internxt
+ExecStart=/home/gandalf/bin/cloudsync.py --folder
 
 [Install]
 WantedBy=multi-user.target

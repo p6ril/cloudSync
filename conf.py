@@ -9,6 +9,7 @@ INTERNXT_DRIVE = USER_HOME + "/Internxt Drive"
 
 FILE_LIST = (
     {'src': DOCUMENTS + "/KeePassXC.kdbx", 'dst': SPIDEROAK_HIVE + "/security"},
+    {'src': DOCUMENTS + "/KeePassXC-noyubikey.kdbx", 'dst': SPIDEROAK_HIVE + "/security"},
 )
 
 FOLDER_LIST = (

@@ -4,7 +4,7 @@ Wants=keepassxcSync.timer
 
 [Service]
 Type=oneshot
-ExecStart=/home/gandalf/bin/cloudsync.py --spideroak
+ExecStart=/home/gandalf/bin/cloudsync.py --file
 
 [Install]
 WantedBy=multi-user.target
