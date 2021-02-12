@@ -2,52 +2,57 @@
 
 USER_HOME = "/home/gandalf"
 DOCUMENTS = USER_HOME + "/Documents"
-SPIDEROAK_HIVE = USER_HOME + "/SpiderOak Hive"
+TRESORIT_DRIVE = USER_HOME + "/Tresors"
 INTERNXT_DRIVE = USER_HOME + "/Internxt Drive"
 
 # only FILE_LIST and FOLDER_LIST are imported in cloudsync.py
 
 FILE_LIST = (
-    {'src': DOCUMENTS + "/KeePassXC.kdbx", 'dst': SPIDEROAK_HIVE + "/security"},
-    {'src': DOCUMENTS + "/KeePassXC-noyubikey.kdbx", 'dst': SPIDEROAK_HIVE + "/security"},
+    {'src': DOCUMENTS + "/KeePassXC.kdbx", 'dst': TRESORIT_DRIVE + "/security"},
+    {'src': DOCUMENTS + "/KeePassXC-noyubikey.kdbx", 'dst': TRESORIT_DRIVE + "/security"},
 )
 
 FOLDER_LIST = (
     {
-        'src': SPIDEROAK_HIVE + "/finance",
-        'dst': INTERNXT_DRIVE,
-        'options': (
-            "-rpAXogEt",
-            "--delete"
-        )
-    },
-    {
-        'src': SPIDEROAK_HIVE + "/documents",
-        'dst': INTERNXT_DRIVE,
-        'options': (
-            "-rpAXogEt",
-            "--delete"
-        )
-    },
-    {
-        'src': SPIDEROAK_HIVE + "/music",
-        'dst': INTERNXT_DRIVE,
-        'options': (
-            "-rpAXogEt",
-            "--delete"
-        )
-    },
-    {
-        'src': SPIDEROAK_HIVE + "/security",
+        'src': TRESORIT_DRIVE + "/finance",
         'dst': INTERNXT_DRIVE,
         'options': (
             "-rpAXogEt",
             "--delete",
-            "--exclude=security/archives", )
+            "--exclude=.tresorit"
+        )
+    },
+    {
+        'src': TRESORIT_DRIVE + "/documents",
+        'dst': INTERNXT_DRIVE,
+        'options': (
+            "-rpAXogEt",
+            "--delete",
+            "--exclude=.tresorit"
+        )
+    },
+    {
+        'src': TRESORIT_DRIVE + "/music",
+        'dst': INTERNXT_DRIVE,
+        'options': (
+            "-rpAXogEt",
+            "--delete",
+            "--exclude=.tresorit"
+        )
+    },
+    {
+        'src': TRESORIT_DRIVE + "/security",
+        'dst': INTERNXT_DRIVE,
+        'options': (
+            "-rpAXogEt",
+            "--delete",
+            "--exclude=.tresorit",
+            "--exclude=security/archives"
+        )
     },
     {
         'src': USER_HOME + "/dev/cloudsync",
-        'dst': SPIDEROAK_HIVE + "/gitbackup",
+        'dst': TRESORIT_DRIVE + "/gitbackup",
         'options': (
             "-rpAXogEtc",
             "--delete",
@@ -60,7 +65,7 @@ FOLDER_LIST = (
     },
     {
         'src': USER_HOME + "/dev/joplinRevisionsCleanUp",
-        'dst': SPIDEROAK_HIVE + "/gitbackup",
+        'dst': TRESORIT_DRIVE + "/gitbackup",
         'options': (
             "-rpAXogEtc",
             "--delete",
@@ -71,11 +76,22 @@ FOLDER_LIST = (
         )
     },
     {
-        'src': SPIDEROAK_HIVE + "/gitbackup",
+        'src': USER_HOME + "/dev/dirdiff",
+        'dst': TRESORIT_DRIVE + "/gitbackup",
+        'options': (
+            "-rpAXogEtc",
+            "--delete",
+            "--exclude=.git",
+            "--exclude=*.swp"
+        )
+    },
+    {
+        'src': TRESORIT_DRIVE + "/gitbackup",
         'dst': INTERNXT_DRIVE,
         'options': (
             "-rpAXogEt",
-            "--delete"
+            "--delete", 
+            "--exclude=.tresorit"
         )
     }
 )
