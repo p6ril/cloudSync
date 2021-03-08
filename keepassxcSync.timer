@@ -1,5 +1,5 @@
 [Unit]
-Description=KeepassXC to SpiderOak Hive sync (both ways)
+Description=KeepassXC file Tresorit sync (both ways)
 Requires=keepassxcSync.service
 
 [Timer]
