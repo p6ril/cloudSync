@@ -1,5 +1,5 @@
 [Unit]
-Description=KeepassXC file Tresorit sync (both ways)
+Description=KeepassXC database file sync with Tresorit (both ways)
 Requires=keepassxcSync.service
 
 [Timer]

@@ -1,5 +1,5 @@
 [Unit]
-Description=SpiderOak Hive sync to Internxt Drive as a backup
+Description=Tresorit sync to Internxt Drive as a backup
 Wants=internxtSync.timer
 
 [Service]

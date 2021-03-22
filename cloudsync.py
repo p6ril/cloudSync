@@ -21,7 +21,7 @@ def filersync(src, dst):
 
 
 def syncfile(src, dst):
-    """The syncfile(src, dst) function synces a file specified as src with the dst directory (both ways).
+    """The syncfile(src, dst) function synchronizes a file specified as src with the dst directory (both ways).
     src (string) - the source file's full path (i.e. /path/filename)
     dst (string) - the destination directory's full path to rsync src to"""
     if not isinstance(src, str) or (isinstance(src, str) and len(src) == 0):
@@ -38,7 +38,7 @@ def syncfile(src, dst):
         return False
     srcpath, filename = os.path.split(src)
     if len(srcpath) == 0:
-        srcpath = os.getcwd()  # precaution in case only a filename is passed see below line 56
+        srcpath = os.getcwd()  # precaution in case only a filename is passed see below line 52
     target = dst + "/" + filename
     if not os.path.isfile(target):  # the src file doesn't exist in the dst directory, initiate sync
         return filersync(src, dst)

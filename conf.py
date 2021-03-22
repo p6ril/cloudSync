@@ -9,7 +9,7 @@ INTERNXT_DRIVE = USER_HOME + "/Internxt Drive"
 
 FILE_LIST = (
     {'src': DOCUMENTS + "/KeePassXC.kdbx", 'dst': TRESORIT_DRIVE + "/security"},
-    {'src': DOCUMENTS + "/KeePassXC-noyubikey.kdbx", 'dst': TRESORIT_DRIVE + "/security"},
+    {'src': DOCUMENTS + "/KeePassXC-noyubikey.kdbx", 'dst': TRESORIT_DRIVE + "/security"}
 )
 
 FOLDER_LIST = (
