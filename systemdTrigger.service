@@ -1,0 +1,10 @@
+[Unit]
+Description=Systemd service unit to trigger cloudsync.py
+Wants=systemdTrigger.timer
+
+[Service]
+Type=oneshot
+ExecStart=/home/user_name/bin/cloudsync.py --folder
+
+[Install]
+WantedBy=multi-user.target

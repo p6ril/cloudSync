@@ -1,0 +1,10 @@
+[Unit]
+Description=Systemd service unit to trigger cloudsync.py
+Requires=systemdTrigger.service
+
+[Timer]
+Unit=systemdTrigger.service
+OnCalendar=*-*-* *:00,15,30,45:00
+
+[Install]
+WantedBy=timers.target
